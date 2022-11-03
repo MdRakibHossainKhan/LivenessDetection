@@ -1,6 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Liveness Detection</string>
-
     <string name="smiling">Smiling</string>
     <string name="not_smiling">Not Smiling</string>
     <string name="right_eye_blinking">Right Eye Blinking</string>
