@@ -1,13 +1,18 @@
 package com.rakib.livenessdetection
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetector
 
-class ImageAnalyzer(private val detector: FaceDetector, private val context: Context?) :
-    ImageAnalysis.Analyzer {
+class ImageAnalyzer(
+    private val detector: FaceDetector,
+    private val context: Context?,
+    private val updateViewCallback: UpdateViewCallback
+) : ImageAnalysis.Analyzer {
+    @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
 
@@ -23,10 +28,10 @@ class ImageAnalyzer(private val detector: FaceDetector, private val context: Con
                         val smileProb = face.smilingProbability
                         if (smileProb!! >= 0.7) {
                             // Smiling
-                            // TODO
+                            updateViewCallback.updateSmileText(context?.getString(R.string.smiling))
                         } else {
                             // Not Smiling
-                            // TODO
+                            updateViewCallback.updateSmileText(context?.getString(R.string.not_smiling))
                         }
                     }
 
@@ -43,16 +48,16 @@ class ImageAnalyzer(private val detector: FaceDetector, private val context: Con
 
                     if (rightEyeOpenProb <= .1 && leftEyeOpenProb <= .1) {
                         // Both Eyes Blinking
-                        // TODO
+                        updateViewCallback.updateBlinkText(context?.getString(R.string.both_eyes_blinking))
                     } else if (rightEyeOpenProb <= .1) {
-                        // Right Eye Blinking
-                        // TODO
-                    } else if (leftEyeOpenProb <= .1) {
                         // Left Eye Blinking
-                        // TODO
+                        updateViewCallback.updateBlinkText(context?.getString(R.string.left_eye_blinking))
+                    } else if (leftEyeOpenProb <= .1) {
+                        // Right Eye Blinking
+                        updateViewCallback.updateBlinkText(context?.getString(R.string.right_eye_blinking))
                     } else {
                         // Not Blinking
-                        // TODO
+                        updateViewCallback.updateBlinkText(context?.getString(R.string.not_blinking))
                     }
                 }
             }.addOnCompleteListener {

@@ -17,12 +17,15 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.rakib.livenessdetection.databinding.ActivityPreviewBinding
+import kotlinx.android.synthetic.main.activity_preview.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class PreviewActivity : AppCompatActivity() {
+class PreviewActivity : AppCompatActivity(), UpdateViewCallback {
     private lateinit var viewBinding: ActivityPreviewBinding
     private lateinit var cameraExecutor: ExecutorService
+
+    private var updateViewCallback: UpdateViewCallback = this@PreviewActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +48,7 @@ class PreviewActivity : AppCompatActivity() {
     // High Accuracy Face Classification
     private val highAccuracyOpts = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
-        .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
-        .build()
+        .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL).build()
 
     private val detector: FaceDetector = FaceDetection.getClient(highAccuracyOpts)
 
@@ -58,20 +60,19 @@ class PreviewActivity : AppCompatActivity() {
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
             // Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
-                }
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
+            }
 
             // Select Front Camera as a Default
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
-            val imageAnalysis = ImageAnalysis.Builder()
-                .setTargetResolution(Size(1280, 720))
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build().also {
-                    it.setAnalyzer(cameraExecutor, ImageAnalyzer(detector, this@PreviewActivity))
+            val imageAnalysis = ImageAnalysis.Builder().setTargetResolution(Size(1280, 720))
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build().also {
+                    it.setAnalyzer(
+                        cameraExecutor,
+                        ImageAnalyzer(detector, this@PreviewActivity, updateViewCallback)
+                    )
                 }
 
             try {
@@ -89,8 +90,7 @@ class PreviewActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
@@ -98,9 +98,7 @@ class PreviewActivity : AppCompatActivity() {
                 startCamera()
             } else {
                 Toast.makeText(
-                    this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT
+                    this, "Permissions not granted by the user.", Toast.LENGTH_SHORT
                 ).show()
                 finish()
             }
@@ -119,5 +117,13 @@ class PreviewActivity : AppCompatActivity() {
         private val REQUIRED_PERMISSIONS = mutableListOf(
             Manifest.permission.CAMERA
         ).toTypedArray()
+    }
+
+    override fun updateSmileText(smileString: String?) {
+        smileTextView.text = smileString
+    }
+
+    override fun updateBlinkText(blinkString: String?) {
+        blinkTextView.text = blinkString
     }
 }
