@@ -17,19 +17,16 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.rakib.livenessdetection.databinding.ActivityPreviewBinding
-import kotlinx.android.synthetic.main.activity_preview.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class PreviewActivity : AppCompatActivity(), UpdateViewCallback {
     private lateinit var viewBinding: ActivityPreviewBinding
     private lateinit var cameraExecutor: ExecutorService
-
     private var updateViewCallback: UpdateViewCallback = this@PreviewActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         viewBinding = ActivityPreviewBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
@@ -93,6 +90,7 @@ class PreviewActivity : AppCompatActivity(), UpdateViewCallback {
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 startCamera()
@@ -100,6 +98,7 @@ class PreviewActivity : AppCompatActivity(), UpdateViewCallback {
                 Toast.makeText(
                     this, "Permissions not granted by the user.", Toast.LENGTH_SHORT
                 ).show()
+
                 finish()
             }
         }
@@ -120,10 +119,10 @@ class PreviewActivity : AppCompatActivity(), UpdateViewCallback {
     }
 
     override fun updateSmileText(smileString: String?) {
-        smileTextView.text = smileString
+        viewBinding.smileTextView.text = smileString
     }
 
     override fun updateBlinkText(blinkString: String?) {
-        blinkTextView.text = blinkString
+        viewBinding.blinkTextView.text = blinkString
     }
 }
