@@ -96,7 +96,7 @@ class PreviewActivity : AppCompatActivity(), UpdateViewCallback {
                 startCamera()
             } else {
                 Toast.makeText(
-                    this, "Permissions not granted by the user.", Toast.LENGTH_SHORT
+                    this, "Permissions denied by the user.", Toast.LENGTH_SHORT
                 ).show()
 
                 finish()
